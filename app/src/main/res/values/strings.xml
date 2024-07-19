@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">legohelper</string>
+    <string name="collect_sets">Сборка наборов</string>
+    <string name="add_set">Добавить набор</string>
+    <string name="set_data">Свойства набора</string>
+    <string name="load_from_brick_link">Загрузить из Brick Link</string>
+    <string name="go_to_collect">Перейти к сборке</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="set_element_high">80dp</dimen>
+    <dimen name="standart_padding">4dp</dimen>
+    <dimen name="standart_padding_end">4dp</dimen>
+    <dimen name="dimen_16dp">16dp</dimen>
+    <dimen name="dimen_8dp">8dp</dimen>
+    <dimen name="margin_8">8dp</dimen>
+    <dimen name="standart_button">50dp</dimen>
+</resources>

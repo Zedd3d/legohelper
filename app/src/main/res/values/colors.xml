@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#42AAFF</color>
+    <color name="gray">#808080</color>
+    <color name="red">#ff0000</color>
+    <color name="lightGray">#c8c8c8</color>
+
+    <color name="BlackDay_WhiteNight">@color/black</color>
+    <color name="WhiteDay_BlackNight">@color/white</color>
+    <color name="LightGrayDay_GrayNight">@color/lightGray</color>
+    <color name="GrayDay_WhiteNight">@color/gray</color>
+</resources>
