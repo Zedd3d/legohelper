@@ -7,8 +7,9 @@ import androidx.room.Relation
 
 @Entity(tableName = "sets_table")
 data class SetEntity(
-    @PrimaryKey
-    val id: String, // ИД набора
+    @PrimaryKey(autoGenerate = true)
+    val id: Int, // автоматический ИД
+    val setIdExt: String, // ИД набора по классификации Лего
     val name: String // Название набора
 )
 
@@ -16,7 +17,7 @@ data class SetEntity(
 data class SetLineEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0, // Просто номер строки табличной части
-    val setId: String, // ИД набора, к которому относится эта строка
+    val setId: Int, // ИД набора, к которому относится эта строка
     val partId: String, // ИД детали
     val count: Int, // Количество необходимых деталей
     val countFound: Int // Количество найденных деталей
@@ -38,7 +39,7 @@ data class SetWithLines(
         parentColumn = "id",
         entityColumn = "setId"
     )
-    val lines: List<SetLineEntity>
+    val lines: List<SetLineEntity> = emptyList()
 )
 
 // DTO для представления строки набора с деталью

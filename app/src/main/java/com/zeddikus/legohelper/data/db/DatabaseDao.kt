@@ -27,15 +27,16 @@ interface DatabaseDao {
 
     @Transaction
     @Query("SELECT * FROM sets_table WHERE id = :setId")
-    suspend fun getSetWithLines(setId: String): SetWithLines
+    suspend fun getSetWithLines(setId: Int): SetWithLines?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPart(part: PartEntity)
 
     @Transaction
     @Query("SELECT * FROM setlines_table WHERE id = :lineId")
-    suspend fun getSetLineWithPart(lineId: Int): SetLineWithPart
+    suspend fun getSetLineWithPart(lineId: Int): SetLineWithPart?
 
+    @Transaction
     @Query("SELECT * FROM sets_table")
     suspend fun getSetsWithLines(): List<SetWithLines>
 }

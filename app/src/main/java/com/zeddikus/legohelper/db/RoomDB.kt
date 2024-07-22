@@ -14,7 +14,8 @@ import com.zeddikus.legohelper.domain.db.models.SetLineEntity
         SetLineEntity::class,
         PartEntity::class,
     ],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(
 //    Converters::class,

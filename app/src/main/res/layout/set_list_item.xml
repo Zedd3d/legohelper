@@ -17,7 +17,7 @@
         android:paddingBottom="@dimen/standart_padding">
 
         <TextView
-            android:id="@+id/filterDescription"
+            android:id="@+id/setDescription"
             style="@style/StandartTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

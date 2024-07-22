@@ -70,4 +70,17 @@
 <!--        <item name="android:src">@drawable/favorite_vacancy_drawable_empty</item>-->
     </style>
 
+    <style name="inputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+
+        <item name="boxStrokeColor">@color/text_input_layout_outline</item>
+        <item name="boxStrokeErrorColor">@color/text_input_layout_outline_error</item>
+        <item name="hintTextColor">@color/gray</item>
+        <item name="errorTextColor">@color/red</item>
+        <!--<item name="android:textColorHint">@color/gray_pm</item>-->
+    </style>
+
+    <style name="textInputLayoutStyle" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

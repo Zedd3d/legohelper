@@ -7,4 +7,5 @@
     <dimen name="dimen_8dp">8dp</dimen>
     <dimen name="margin_8">8dp</dimen>
     <dimen name="standart_button">50dp</dimen>
+    <dimen name="corner_radius_8">8dp</dimen>
 </resources>

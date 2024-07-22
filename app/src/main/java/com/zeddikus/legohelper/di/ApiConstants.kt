@@ -1,7 +1,7 @@
 package com.zeddikus.legohelper.di
 
 object ApiConstants {
-    const val BASE_URL = "https://bbahtb5q32tp628tg82c.containers.yandexcloud.net/"
+    const val BASE_URL = "https://www.bricklink.com"
     const val CALL_TIMEOUT = 30
     const val READ_TIMEOUT = 30
 

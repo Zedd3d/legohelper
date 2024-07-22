@@ -9,12 +9,16 @@
         android:id="@+id/homeFragment"
         android:name="com.zeddikus.legohelper.presentation.fragment.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_setFragment"
+            app:destination="@id/setFragment" />
+    </fragment>
     <fragment
         android:id="@+id/setFragment"
-        android:name="com.zeddikus.legohelper.presentation.fragment.SetFragment"
+        android:name="com.zeddikus.legohelper.presentation.fragment.ConstructorSetFragment"
         android:label="fragment_set"
-        tools:layout="@layout/fragment_set"/>
+        tools:layout="@layout/fragment_constructorset"/>
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.zeddikus.legohelper.presentation.fragment.AboutFragment"

@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
 @Module
@@ -22,7 +23,8 @@ class NetworkModule {
         val authorizationInterceptor = { chain: Interceptor.Chain ->
             val request = chain.request()
                 .newBuilder()
-                //.addHeader("X-Authorization", authorizationDataRepository.execute())
+                .addHeader("User-Agent", "app name")
+                .header("Accept", "application/json")
                 .build()
             chain.proceed(request)
         }
@@ -42,7 +44,7 @@ class NetworkModule {
         return Retrofit
             .Builder()
             .baseUrl(ApiConstants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create())
             .client(okHttpClient)
             .build()
     }

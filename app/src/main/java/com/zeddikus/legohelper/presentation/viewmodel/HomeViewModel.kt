@@ -4,27 +4,32 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.zeddikus.legohelper.base.BaseViewModel
-import com.zeddikus.legohelper.domain.LoadSetsUseCase
-import com.zeddikus.legohelper.domain.models.HomeState
+import com.zeddikus.legohelper.domain.SetsInteractor
+import com.zeddikus.legohelper.domain.models.SetsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(
-    private val useCase: LoadSetsUseCase
+    private val setsInteractor: SetsInteractor
 ) :
     BaseViewModel() {
 
-    private val stateLiveData = MutableLiveData<HomeState>()
-    fun observeState(): LiveData<HomeState> = stateLiveData
+    private val stateLiveData = MutableLiveData<SetsState>()
+    fun observeState(): LiveData<SetsState> = stateLiveData
     fun updateSetList() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                useCase.loadSets().collect {
-                    stateLiveData.postValue(it)
+                try {
+                    setsInteractor.loadSets().collect {
+                        stateLiveData.postValue(it)
+                    }
+                } catch (e: Exception){
+                    print(e.printStackTrace())
                 }
+
             }.onFailure {
-                stateLiveData.postValue(HomeState.Error)
+                stateLiveData.postValue(SetsState.Error)
             }
         }
     }
