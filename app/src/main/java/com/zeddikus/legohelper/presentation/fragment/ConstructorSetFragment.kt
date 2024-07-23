@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.lifecycleScope
+import com.zeddikus.legohelper.R
 import com.zeddikus.legohelper.base.BaseFragment
 import com.zeddikus.legohelper.base.BaseViewModel
 import com.zeddikus.legohelper.databinding.FragmentConstructorsetBinding
@@ -15,8 +17,9 @@ import com.zeddikus.legohelper.di.featurecomponents.DaggerConstructorSetComponen
 import com.zeddikus.legohelper.domain.models.ConstructorSet
 import com.zeddikus.legohelper.domain.models.SetState
 import com.zeddikus.legohelper.presentation.viewmodel.SetViewModel
+import com.zeddikus.legohelper.utils.setOnDebouncedClickListener
 
-class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseViewModel>()  {
+class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseViewModel>() {
     override val viewModel by injectViewModel<SetViewModel>()
     override fun diComponent(): ScreenComponent {
         val appComponent = AppComponentHolder.getComponent()
@@ -35,25 +38,23 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val setId = arguments?.getInt(CONSTRUCTOR_SET_ID)?:0
+        val setId = arguments?.getInt(CONSTRUCTOR_SET_ID) ?: 0
         viewModel.updateSetData(setId)
 
         binding.btnLoadFromBrickLink.setOnClickListener {
-            if (binding.editId.editText.text?.isNotEmpty()?:false
-                && binding.editName.editText.text?.isNotEmpty()?:false) {
-                binding.editId.tilEdit.isErrorEnabled = false
-                binding.editName.tilEdit.isErrorEnabled = false
-                viewModel.loadLines(binding.editId.editText.text.toString())
-            } else {
-                binding.editId.tilEdit.isErrorEnabled = binding.editId.editText.text?.isNotEmpty()?:false == false
-                binding.editId.tilEdit.error = "Необходимо заполнить"
-                binding.editName.tilEdit.isErrorEnabled = binding.editName.editText.text?.isNotEmpty()?:false == false
-                binding.editName.tilEdit.error = "Необходимо заполнить"
-            }
+            if (allFieldsFilled())
+                viewModel.loadLines(
+                    binding.editId.editText.text.toString(),
+                    binding.editName.editText.text.toString()
+                )
         }
 
-        binding.btnGoToCollect.setOnClickListener {
-            //to-do
+        binding.btnGoToCollect.setOnDebouncedClickListener(lifecycleScope) {
+            if (allFieldsFilled()) viewModel.goToCollect(
+                binding.editId.editText.text.toString(),
+                binding.editName.editText.text.toString()
+            )
+
         }
 
         binding.toolbar.setNavigationOnClickListener {
@@ -68,16 +69,57 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
         binding.toolbar.setNavigationOnClickListener { onBackPressed() }
 
-        setTexts(ConstructorSet(0,"",""))
+        setTexts(ConstructorSet(0, "", ""))
 
-        viewModel.observeState().observe(viewLifecycleOwner){
+        viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
+        }
+
+        viewModel.observeSingleState().observe(viewLifecycleOwner) {
+            if (it>0) {
+                val bundle = Bundle().apply {
+                    putInt(CONSTRUCTOR_SET_ID, it)
+                }
+                viewModel.navigateTo(
+                    ConstructorSetFragmentDirections.actionSetFragmentToLinesScreenFragment().actionId,
+                    bundle
+                )
+            }
         }
     }
 
-    private fun onBackPressed(){
-        if (binding.editId.editText.text?.isNotEmpty()?:false
-            && binding.editName.editText.text?.isNotEmpty()?:false) {
+    private fun allFieldsFilled(): Boolean {
+        return if (binding.editId.editText.text?.isNotEmpty() ?: false
+            && binding.editName.editText.text?.isNotEmpty() ?: false
+        ) {
+            binding.editId.tilEdit.isErrorEnabled = false
+            binding.editName.tilEdit.isErrorEnabled = false
+
+            true
+        } else {
+            binding.editId.tilEdit.isErrorEnabled = when (binding.editId.editText.text?.isNotEmpty() ?: false) {
+                false -> {
+                    binding.editId.tilEdit.error = getString(R.string.need_f)
+                    false
+                }
+                else -> true
+            }
+
+            binding.editName.tilEdit.isErrorEnabled = when (binding.editName.editText.text?.isNotEmpty() ?: false) {
+                false -> {
+                    binding.editName.tilEdit.error = getString(R.string.need_f)
+                    false
+                }
+                else -> true
+            }
+            false
+        }
+    }
+
+    private fun onBackPressed() {
+        if (binding.editId.editText.text?.isNotEmpty() ?: false
+            && binding.editName.editText.text?.isNotEmpty() ?: false
+        ) {
             viewModel.saveSetData(
                 binding.editId.editText.text.toString(),
                 binding.editName.editText.text.toString()
@@ -86,20 +128,22 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         viewModel.navigateUp()
     }
 
-    private fun render(state: SetState){
-        when (state){
+    private fun render(state: SetState) {
+        when (state) {
             is SetState.Data -> {
                 setTexts(state.set)
             }
+
             SetState.Empty -> {
-                setTexts(ConstructorSet(0,"",""))
+                setTexts(ConstructorSet(0, "", ""))
             }
-            SetState.Error -> Toast.makeText(requireContext(),"Ошибка",Toast.LENGTH_SHORT).show()
+
+            SetState.Error -> Toast.makeText(requireContext(), "Ошибка", Toast.LENGTH_SHORT).show()
         }
 
     }
 
-    private fun setTexts(constructorSet: ConstructorSet){
+    private fun setTexts(constructorSet: ConstructorSet) {
         binding.editId.tilEdit.hint = "Номер набора"
         binding.editName.tilEdit.hint = "Наименование набора"
 
@@ -107,7 +151,12 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         binding.editName.editText.setText(constructorSet.name)
     }
 
-    companion object{
+    override fun onResume() {
+        super.onResume()
+        viewModel.clearGoToValue()
+    }
+
+    companion object {
         const val CONSTRUCTOR_SET_ID = "constructor_set_id"
     }
 }

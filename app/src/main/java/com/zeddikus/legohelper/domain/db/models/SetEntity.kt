@@ -28,7 +28,7 @@ data class PartEntity(
     @PrimaryKey
     val id: String,  // ИД детали
     val name: String, // Имя детали Лего
-    val data: String, // Картинка детали в формате Base 64
+    val imgUrl: String, // Картинка детали в формате Base 64
     val colorCode: String // Код цвета детали
 )
 
@@ -50,4 +50,9 @@ data class SetLineWithPart(
         entityColumn = "id"
     )
     val part: PartEntity
+)
+
+data class SetWithLinesWithPart(
+    val set: SetEntity,
+    val lines: List<SetLineWithPart>
 )

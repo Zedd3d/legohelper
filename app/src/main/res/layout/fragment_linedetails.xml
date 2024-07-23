@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/toolbarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/back_button"
+        app:title="@string/line_details_descr"></androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/tvName"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:text="Имя детали" />
+
+
+    <TextView
+        android:id="@+id/tvColorCode"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvName"
+        tools:text="Имя цвета" />
+
+    <LinearLayout
+        android:id="@+id/llNumericBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvColorCode">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnOne"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="1"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnTwo"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="2"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnThree"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="3"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnFour"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="4"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnFive"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="5"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnSix"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="6"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnSeven"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="7"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnEight"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="8"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnNine"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="9"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnTen"
+                style="@style/StandartButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_weight="1"
+                android:text="10"
+                android:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvCountTitle"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llNumericBlock"
+        tools:text="@string/need_collect" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llNumericBlock"
+        tools:text="0" />
+
+    <TextView
+        android:id="@+id/tvCountFindTitle"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCountTitle"
+        tools:text="@string/now_collected" />
+
+    <TextView
+        android:id="@+id/tvCountFind"
+        style="@style/TitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCountFindTitle"
+        app:layout_constraintEnd_toStartOf="@id/btnPlusOne"
+        app:layout_constraintTop_toTopOf="@+id/tvCountFindTitle"
+        tools:text="0" />
+
+    <Button
+        android:id="@+id/btnPlusOne"
+        style="@style/StandartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="2dp"
+        android:layout_weight="1"
+        android:text="+"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCountFind"
+        app:layout_constraintEnd_toStartOf="@id/btnMinusOne"
+        app:layout_constraintTop_toTopOf="@+id/tvCountFind" />
+
+    <Button
+        android:id="@+id/btnMinusOne"
+        style="@style/StandartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="2dp"
+        android:layout_weight="1"
+        android:text="-"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCountFind"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvCountFind" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/partCover"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCountFindTitle"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_weight="1"
+        app:shapeAppearanceOverlay="@style/roundedCornersImageView"
+        app:srcCompat="@drawable/lego_placeholder" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

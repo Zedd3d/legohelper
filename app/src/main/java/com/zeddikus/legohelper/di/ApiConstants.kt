@@ -2,6 +2,7 @@ package com.zeddikus.legohelper.di
 
 object ApiConstants {
     const val BASE_URL = "https://www.bricklink.com"
+    const val IMG_URL = "https://img.bricklink.com"
     const val CALL_TIMEOUT = 30
     const val READ_TIMEOUT = 30
 

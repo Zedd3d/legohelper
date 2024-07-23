@@ -36,6 +36,7 @@
 
     <style name="TitleTextStyle">
         <item name="android:textSize">22sp</item>
+        <item name="android:padding">10dp </item>
 <!--        <item name="android:fontFamily">@font/ys_display_medium</item>-->
     </style>
 
@@ -81,6 +82,11 @@
 
     <style name="textInputLayoutStyle" parent="TextAppearance.Design.Hint">
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="roundedCornersImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
 </resources>

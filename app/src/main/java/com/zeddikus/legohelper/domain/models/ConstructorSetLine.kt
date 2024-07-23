@@ -1,7 +1,9 @@
 package com.zeddikus.legohelper.domain.models
 
 data class ConstructorSetLine(
+    val lineId: Int,
+    val setId: Int,
     val part: ConstructorPart,
-    val count: Int, //Количество требуемых деталей
-    val countFound: Int // Количество найденных деталей
+    var count: Int, //Количество требуемых деталей
+    var countFound: Int, // Количество найденных деталей
 )

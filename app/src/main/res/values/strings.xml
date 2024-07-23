@@ -5,4 +5,12 @@
     <string name="set_data">Свойства набора</string>
     <string name="load_from_brick_link">Загрузить из Brick Link</string>
     <string name="go_to_collect">Перейти к сборке</string>
+    <string name="collect_process">Процесс сборки</string>
+    <string name="collect_status_line">Собрано</string>
+    <string name="line_details_descr">Подробнее о детали в наборе</string>
+    <string name="need_collect">Необходимо собрать</string>
+    <string name="now_collected">Собрано \t</string>
+    <string name="part_name">Наименование</string>
+    <string name="part_id">ID части</string>
+    <string name="need_f">Необходимо заполнить</string>
 </resources>

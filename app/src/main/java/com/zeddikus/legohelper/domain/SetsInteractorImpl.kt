@@ -1,6 +1,9 @@
 package com.zeddikus.legohelper.domain
 
 import com.zeddikus.legohelper.domain.models.ConstructorSet
+import com.zeddikus.legohelper.domain.models.ConstructorSetLine
+import com.zeddikus.legohelper.domain.models.LineSetState
+import com.zeddikus.legohelper.domain.models.LinesState
 import com.zeddikus.legohelper.domain.models.SetState
 import com.zeddikus.legohelper.domain.models.SetsState
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +22,19 @@ class SetsInteractorImpl @Inject constructor(
         return repository.loadSet(setId)
     }
 
-    override suspend fun saveSet(constructorSet: ConstructorSet) {
-        repository.saveSet(constructorSet)
+    override suspend fun saveSet(constructorSet: ConstructorSet): Int {
+        return repository.saveSet(constructorSet)
+    }
+
+    override suspend fun loadLine(lineId: Int): Flow<LineSetState> {
+        return repository.loadLine(lineId)
+    }
+
+    override suspend fun loadLines(setId: Int): Flow<LinesState> {
+        return repository.loadLines(setId)
+    }
+
+    override suspend fun saveLine(constructorSetLine: ConstructorSetLine): Flow<LineSetState> {
+        return repository.saveLineSet(constructorSetLine)
     }
 }

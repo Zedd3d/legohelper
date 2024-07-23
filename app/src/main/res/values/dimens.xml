@@ -8,4 +8,5 @@
     <dimen name="margin_8">8dp</dimen>
     <dimen name="standart_button">50dp</dimen>
     <dimen name="corner_radius_8">8dp</dimen>
+    <dimen name="line_collect_text_size">18sp</dimen>
 </resources>

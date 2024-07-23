@@ -18,10 +18,28 @@
         android:id="@+id/setFragment"
         android:name="com.zeddikus.legohelper.presentation.fragment.ConstructorSetFragment"
         android:label="fragment_set"
-        tools:layout="@layout/fragment_constructorset"/>
+        tools:layout="@layout/fragment_constructorset">
+        <action
+            android:id="@+id/action_setFragment_to_linesScreenFragment"
+            app:destination="@id/linesScreenFragment" />/>
+    </fragment>
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.zeddikus.legohelper.presentation.fragment.AboutFragment"
         android:label="fragment_about"
         tools:layout="@layout/fragment_about"/>
+    <fragment
+        android:id="@+id/linesScreenFragment"
+        android:name="com.zeddikus.legohelper.presentation.fragment.LinesScreenFragment"
+        android:label="LinesScreenFragment"
+        tools:layout="@layout/fragment_linesscreen">
+        <action
+            android:id="@+id/action_linesScreenFragment_to_linesDetailsFragment"
+            app:destination="@id/linesDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/linesDetailsFragment"
+        android:name="com.zeddikus.legohelper.presentation.fragment.LinesDetailsFragment"
+        android:label="LinesDetailsFragment"
+        tools:layout="@layout/fragment_linedetails"/>
 </navigation>

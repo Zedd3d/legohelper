@@ -4,5 +4,5 @@ data class ConstructorSet(
     val id: Int = 0,
     val setIdExt: String,
     val name: String,
-    val lines: List<ConstructorSetLine> = emptyList()
+    val lines: MutableMap<String, ConstructorSetLine> = mutableMapOf()
 )
