@@ -1,19 +1,24 @@
 package com.zeddikus.legohelper.di.featurecomponents
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.zeddikus.legohelper.data.db.SetsRepositoryImpl
 import com.zeddikus.legohelper.data.db.DatabaseDao
 import com.zeddikus.legohelper.data.network.LegoBrickApi
 import com.zeddikus.legohelper.data.network.NetworkRepositoryImpl
+import com.zeddikus.legohelper.data.sharedpreferences.SettingsRepositoryImpl
 import com.zeddikus.legohelper.db.RoomDB
 import com.zeddikus.legohelper.di.ViewModelKey
 import com.zeddikus.legohelper.domain.SetsInteractor
 import com.zeddikus.legohelper.domain.SetsInteractorImpl
 import com.zeddikus.legohelper.domain.SetsRepository
+import com.zeddikus.legohelper.domain.SettingsRepository
 import com.zeddikus.legohelper.domain.network.NetworkInteractor
 import com.zeddikus.legohelper.domain.network.NetworkInteractorImpl
 import com.zeddikus.legohelper.domain.network.NetworkRepository
-import com.zeddikus.legohelper.presentation.viewmodel.SetViewModel
+import com.zeddikus.legohelper.presentation.viewmodel.ConstructorSetViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -26,9 +31,9 @@ import retrofit2.Retrofit
 interface ConstructorSetModule {
 
     @IntoMap
-    @ViewModelKey(SetViewModel::class)
+    @ViewModelKey(ConstructorSetViewModel::class)
     @Binds
-    fun bindSetViewModel(impl: SetViewModel): ViewModel
+    fun bindSetViewModel(impl: ConstructorSetViewModel): ViewModel
 
     @Binds
     fun provideSetInteractor(impl: SetsInteractorImpl): SetsInteractor
@@ -53,6 +58,11 @@ interface ConstructorSetModule {
         @Provides
         fun provideApi(retrofit: Retrofit): LegoBrickApi {
             return retrofit.create(LegoBrickApi::class.java)
+        }
+
+        @Provides
+        fun provideSettings(context: Context): SettingsRepository {
+            return provideSettingsRepository(context)
         }
     }
 

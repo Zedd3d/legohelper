@@ -2,8 +2,11 @@ package com.zeddikus.legohelper.di
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Shader
 import com.zeddikus.legohelper.db.RoomDB
 import com.zeddikus.legohelper.db.RoomDBModule
+import com.zeddikus.legohelper.di.featurecomponents.SettingsModule
 import dagger.BindsInstance
 import dagger.Component
 import retrofit2.Retrofit
@@ -13,6 +16,7 @@ import retrofit2.Retrofit
         NetworkModule::class,
         RoomDBModule::class,
         ContextModule::class,
+        SettingsModule::class,
     ]
 )
 interface AppComponent : DIComponent {

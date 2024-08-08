@@ -1,9 +1,11 @@
 package com.zeddikus.legohelper.data.db
 
+import android.content.Context
 import com.zeddikus.legohelper.db.RoomDB
 import com.zeddikus.legohelper.domain.SetsRepository
 import com.zeddikus.legohelper.domain.db.models.PartEntity
 import com.zeddikus.legohelper.data.mappers.mapper
+import com.zeddikus.legohelper.domain.SettingsRepository
 import com.zeddikus.legohelper.domain.models.ConstructorPart
 import com.zeddikus.legohelper.domain.models.ConstructorSet
 import com.zeddikus.legohelper.domain.models.ConstructorSetLine
@@ -11,13 +13,17 @@ import com.zeddikus.legohelper.domain.models.LineSetState
 import com.zeddikus.legohelper.domain.models.LinesState
 import com.zeddikus.legohelper.domain.models.SetState
 import com.zeddikus.legohelper.domain.models.SetsState
+import com.zeddikus.legohelper.domain.models.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SetsRepositoryImpl @Inject constructor(
-    private val roomDB: RoomDB
+    private val context: Context,
+    private val roomDB: RoomDB,
+    private val settingsRepository: SettingsRepository
 ) : SetsRepository {
+
     override suspend fun loadSets(): Flow<SetsState> = flow {
         try {
             val result = roomDB.databaseDao().getSetsWithLines().map {
@@ -50,6 +56,12 @@ class SetsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveSet(constructorSet: ConstructorSet): Int {
+        return roomDB.databaseDao().insertSet(
+            mapper.mapToData(constructorSet)
+        ).toInt()
+    }
+
+    override suspend fun saveSetWithLinesAndParts(constructorSet: ConstructorSet): Int {
 
         val listParts = mutableSetOf<ConstructorPart>()
 
@@ -58,7 +70,7 @@ class SetsRepositoryImpl @Inject constructor(
         }
 
         return roomDB.databaseDao().insertSetWithLines(
-            mapper.mapToData(constructorSet),
+            mapper.mapToDataWithLines(constructorSet),
             mapper.mapToData(listParts.toList())
         )
     }
@@ -81,11 +93,20 @@ class SetsRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun loadLines(setId: Int): Flow<LinesState> = flow {
+    override suspend fun loadLines(setId: Int, hideCollected: Boolean): Flow<LinesState> = flow {
+        val sort = settingsRepository.loadSort() as Settings.Sort
         emit(
             LinesState.Data(
-                mapper.mapToDomain(roomDB.databaseDao().getSetLinesWithPart(setId))
+                mapper.mapToDomain(roomDB.databaseDao().getSetLinesWithPartSorted(setId,sort,hideCollected)),
+                settingsRepository.loadColumnCount() as Settings.Columns,
+                sort
             )
         )
     }
+
+    override suspend fun deleteSet(setId: Int): Flow<SetState> = flow {
+        roomDB.databaseDao().deleteSetAndLines(setId)
+        emit(SetState.Deleted)
+    }
+
 }

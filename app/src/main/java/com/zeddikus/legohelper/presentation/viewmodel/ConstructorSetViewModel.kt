@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.zeddikus.legohelper.base.BaseViewModel
+import com.zeddikus.legohelper.di.ErrorTypes
 import com.zeddikus.legohelper.domain.SetsInteractor
 import com.zeddikus.legohelper.domain.models.ConstructorSet
 import com.zeddikus.legohelper.domain.models.SetState
@@ -13,11 +14,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SetViewModel @Inject constructor(
+class ConstructorSetViewModel @Inject constructor(
     private val setsInteractor: SetsInteractor,
     private val networkInteractor: NetworkInteractor
 ) :
     BaseViewModel() {
+
+    private var currentSetId: Int = 0
 
     private val stateLiveData = MutableLiveData<SetState>()
     fun observeState(): LiveData<SetState> = stateLiveData
@@ -33,10 +36,13 @@ class SetViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     setsInteractor.loadSet(setId).collect {
+                        if (it is SetState.Data){
+                            currentSetId = it.set.id
+                        }
                         stateLiveData.postValue(it)
                     }
                 }.onFailure {
-                    stateLiveData.postValue(SetState.Error)
+                    stateLiveData.postValue(SetState.Error(ErrorTypes.Unknown))
                 }
             }
         }
@@ -48,7 +54,7 @@ class SetViewModel @Inject constructor(
             runCatching {
                 doSaveSetData(setIdExt, setName)
             }.onFailure {
-                stateLiveData.postValue(SetState.Error)
+                stateLiveData.postValue(SetState.Error(ErrorTypes.Unknown))
             }
         }
     }
@@ -58,13 +64,15 @@ class SetViewModel @Inject constructor(
         if (stateLiveData.value is SetState.Error) return
 
         val currentValue = stateLiveData.value
-        val setId = if (currentValue is SetState.Data) {
+        currentSetId = if (currentValue is SetState.Data) {
             setsInteractor.saveSet(
                 currentValue.set.copy(
                     setIdExt = setIdExt,
                     name = setName
                 )
             )
+
+
         } else {
             setsInteractor.saveSet(
                 ConstructorSet(
@@ -74,7 +82,7 @@ class SetViewModel @Inject constructor(
             )
         }
         stateLiveData.postValue(SetState.Data(ConstructorSet(
-            id = setId,
+            id = currentSetId,
             setIdExt = setIdExt,
             name = setName
         )))
@@ -83,31 +91,49 @@ class SetViewModel @Inject constructor(
     fun loadLines(setIdExt: String, setName: String){
         viewModelScope.launch(Dispatchers.IO) {
             doSaveSetData(setIdExt, setName)
-            runCatching {
-                networkInteractor.loadSet(setIdExt).collect{}
-            }.onFailure {
-                stateLiveData.postValue(SetState.Error)
-            }
+//            runCatching {
+                networkInteractor.loadSet(setIdExt).collect{
+                    stateLiveData.postValue(it)
+                }
+//            }.onFailure {
+//                stateLiveData.postValue(SetState.Error(ErrorTypes.Unknown))
+//            }
 
         }
     }
 
     fun goToCollect(setIdExt: String, setName: String){
-        val cv = stateLiveData.value
-        if (cv is SetState.Data)
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                doSaveSetData(setIdExt, setName)
-                stateSingleLiveData.postValue(cv.set.id)
-                delay(400)
-                stateSingleLiveData.postValue(0)
-            }.onFailure {
-                stateLiveData.postValue(SetState.Error)
+        if (currentSetId != 0) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    doSaveSetData(setIdExt, setName)
+                    stateSingleLiveData.postValue(currentSetId)
+                    delay(400)
+                    stateSingleLiveData.postValue(0)
+                }.onFailure {
+                    stateLiveData.postValue(SetState.Error(ErrorTypes.Unknown))
+                }
             }
         }
     }
 
     fun clearGoToValue(){
         stateSingleLiveData.postValue(0)
+    }
+
+    fun deleteSet(){
+        if (currentSetId != 0) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    setsInteractor.deleteSet(currentSetId).collect {
+                        stateLiveData.postValue(it)
+                    }
+                }.onFailure {
+                    stateLiveData.postValue(SetState.Error(ErrorTypes.Unknown))
+                }
+            }
+        } else {
+            stateLiveData.postValue(SetState.Deleted)
+        }
     }
 }

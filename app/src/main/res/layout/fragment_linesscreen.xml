@@ -12,7 +12,59 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/back_button"
-        app:title="@string/collect_process">
+        app:title="">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnHide"
+            style="@style/StandartButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/standart_button"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            tools:text="Скрыть отобранные"
+            android:visibility="visible" />
+
+
+
+        <ImageButton
+            android:id="@+id/btnUp"
+            style="@style/StandartButton"
+            android:layout_width="@dimen/small_button"
+            android:layout_height="@dimen/small_button"
+            android:layout_margin="0dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_arrow_up"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btnDown"
+            style="@style/StandartButton"
+            android:layout_width="@dimen/small_button"
+            android:layout_height="@dimen/small_button"
+            android:layout_margin="0dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_arrow_down"
+            android:visibility="visible"
+            tools:visibility="visible" />
+            <Button
+                android:id="@+id/btnSelectSort"
+                style="@style/StandartButton"
+                android:layout_width="120dp"
+                android:layout_height="@dimen/standart_button"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:textSize="12sp"
+                tools:text="По имени, по возрастанию"
+                android:visibility="visible" />
+        </LinearLayout>
+
+
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView

@@ -20,6 +20,8 @@ class LineDetailsViewModel @Inject constructor(
 ) :
     BaseViewModel() {
 
+    private var currentLine: ConstructorSetLine? = null
+
     private val stateLiveData = MutableLiveData<LineSetState>()
     fun observeState(): LiveData<LineSetState> = stateLiveData
 
@@ -28,6 +30,9 @@ class LineDetailsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 setsInteractor.loadLine(lineId).collect {
+                    if (it is LineSetState.Data) {
+                        currentLine = it.line
+                    }
                     stateLiveData.postValue(it)
                 }
             }.onFailure {
@@ -40,11 +45,33 @@ class LineDetailsViewModel @Inject constructor(
     fun saveLine(constructorSetLine: ConstructorSetLine){
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                setsInteractor.saveLine(constructorSetLine)
+                setsInteractor.saveLine(constructorSetLine).collect{}
             }.onFailure {
                 stateLiveData.postValue(LineSetState.Error)
             }
         }
     }
 
+    fun setCountFromButton(countFound: Int){
+        currentLine?.let {
+            applyChanges(countFound,it.count,it)
+        }
+    }
+
+    fun changeCountFromButton(change: Int){
+        currentLine?.let {
+            var resultInt = it.countFound + change
+            applyChanges(resultInt,it.count,it)
+        }
+    }
+
+    fun applyChanges(countFound: Int, count: Int, line: ConstructorSetLine){
+        var resultInt = countFound
+        if (resultInt<0) {resultInt = 0} else {}
+        if (resultInt>count) {resultInt = count} else {}
+        val result = line.copy(countFound = resultInt)
+        currentLine = result
+        saveLine(result)
+        stateLiveData.postValue(LineSetState.Data(result))
+    }
 }

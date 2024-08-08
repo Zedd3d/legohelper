@@ -30,11 +30,15 @@ class SetsInteractorImpl @Inject constructor(
         return repository.loadLine(lineId)
     }
 
-    override suspend fun loadLines(setId: Int): Flow<LinesState> {
-        return repository.loadLines(setId)
+    override suspend fun loadLines(setId: Int, hideCollected: Boolean): Flow<LinesState> {
+        return repository.loadLines(setId, hideCollected)
     }
 
     override suspend fun saveLine(constructorSetLine: ConstructorSetLine): Flow<LineSetState> {
         return repository.saveLineSet(constructorSetLine)
+    }
+
+    override suspend fun deleteSet(setId: Int): Flow<SetState> {
+        return repository.deleteSet(setId)
     }
 }

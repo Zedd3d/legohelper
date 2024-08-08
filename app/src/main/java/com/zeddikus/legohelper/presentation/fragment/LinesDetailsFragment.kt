@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.zeddikus.legohelper.R
@@ -26,6 +30,7 @@ import com.zeddikus.legohelper.presentation.linesadapter.LinesAdapter
 import com.zeddikus.legohelper.presentation.setsadapter.SetsAdapter
 import com.zeddikus.legohelper.presentation.viewmodel.LineDetailsViewModel
 import com.zeddikus.legohelper.presentation.viewmodel.LinesScreenViewModel
+import com.zeddikus.legohelper.utils.setOnDebouncedClickListener
 
 class LinesDetailsFragment : BaseFragment<FragmentLinedetailsBinding, BaseViewModel>() {
 
@@ -53,6 +58,56 @@ class LinesDetailsFragment : BaseFragment<FragmentLinedetailsBinding, BaseViewMo
         viewModel.observeState().observe(viewLifecycleOwner){
             render(it)
         }
+        setListeners()
+    }
+
+    private fun setListeners(){
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
+
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onBackPressed()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+        binding.toolbar.setNavigationOnClickListener { onBackPressed() }
+
+        binding.llNumericBlock.setOnDebouncedClickListener(lifecycleScope){
+            val a=1
+        }
+
+        // Перебор всех дочерних элементов в LinearLayout
+        for (i in 0 until binding.llNumericBlock.childCount) {
+            val view: View = binding.llNumericBlock.getChildAt(i)
+            if (view is LinearLayout) {
+                for (j in 0 until view.childCount) {
+                    val viewB: View = view.getChildAt(j)
+                    if (viewB is Button) {
+                        // Установка одинакового слушателя нажатия на кнопку
+                        viewB.setOnClickListener { button ->
+                            handleButtonClick(button as Button)
+                        }
+                    }
+                }
+            }
+        }
+
+        binding.btnPlusOne.setOnDebouncedClickListener(lifecycleScope){
+            viewModel.changeCountFromButton(1)
+        }
+        binding.btnMinusOne.setOnDebouncedClickListener(lifecycleScope){
+            viewModel.changeCountFromButton(-1)
+        }
+    }
+
+    private fun handleButtonClick(button: Button) {
+        viewModel.setCountFromButton(button.text.toString().toInt())
+    }
+
+    private fun onBackPressed() {
+        viewModel.navigateUp()
     }
 
     private fun render(state: LineSetState){

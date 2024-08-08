@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.zeddikus.legohelper.R
 import com.zeddikus.legohelper.base.BaseFragment
@@ -16,11 +17,13 @@ import com.zeddikus.legohelper.di.ScreenComponent
 import com.zeddikus.legohelper.di.featurecomponents.DaggerConstructorSetComponent
 import com.zeddikus.legohelper.domain.models.ConstructorSet
 import com.zeddikus.legohelper.domain.models.SetState
-import com.zeddikus.legohelper.presentation.viewmodel.SetViewModel
+import com.zeddikus.legohelper.presentation.viewmodel.ConstructorSetViewModel
 import com.zeddikus.legohelper.utils.setOnDebouncedClickListener
+import com.zeddikus.legohelper.utils.setViewAndChildrenEnabled
 
 class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseViewModel>() {
-    override val viewModel by injectViewModel<SetViewModel>()
+
+    override val viewModel by injectViewModel<ConstructorSetViewModel>()
     override fun diComponent(): ScreenComponent {
         val appComponent = AppComponentHolder.getComponent()
         return DaggerConstructorSetComponent.builder()
@@ -41,8 +44,31 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         val setId = arguments?.getInt(CONSTRUCTOR_SET_ID) ?: 0
         viewModel.updateSetData(setId)
 
+        setListeners()
+
+        setTexts(ConstructorSet(0, "", ""))
+
+        viewModel.observeState().observe(viewLifecycleOwner) {
+            render(it)
+        }
+
+        viewModel.observeSingleState().observe(viewLifecycleOwner) {
+            if (it>0) {
+                val bundle = Bundle().apply {
+                    putInt(CONSTRUCTOR_SET_ID, it)
+                }
+                viewModel.navigateTo(
+                    ConstructorSetFragmentDirections.actionSetFragmentToLinesScreenFragment().actionId,
+                    bundle
+                )
+            }
+        }
+    }
+
+    private fun setListeners(){
         binding.btnLoadFromBrickLink.setOnClickListener {
             if (allFieldsFilled())
+                blockScreen(true)
                 viewModel.loadLines(
                     binding.editId.editText.text.toString(),
                     binding.editName.editText.text.toString()
@@ -69,21 +95,12 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
         binding.toolbar.setNavigationOnClickListener { onBackPressed() }
 
-        setTexts(ConstructorSet(0, "", ""))
-
-        viewModel.observeState().observe(viewLifecycleOwner) {
-            render(it)
-        }
-
-        viewModel.observeSingleState().observe(viewLifecycleOwner) {
-            if (it>0) {
-                val bundle = Bundle().apply {
-                    putInt(CONSTRUCTOR_SET_ID, it)
+        binding.btnDeleteSet.setOnDebouncedClickListener(lifecycleScope){
+            showDialog(
+                getString(R.string.q_delete_set)){ resultInt ->
+                if (resultInt == Q_POSITIVE) {
+                    viewModel.deleteSet()
                 }
-                viewModel.navigateTo(
-                    ConstructorSetFragmentDirections.actionSetFragmentToLinesScreenFragment().actionId,
-                    bundle
-                )
             }
         }
     }
@@ -116,8 +133,9 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         }
     }
 
-    private fun onBackPressed() {
-        if (binding.editId.editText.text?.isNotEmpty() ?: false
+    private fun onBackPressed(needCheckAndSave: Boolean = true) {
+        if (needCheckAndSave
+            && binding.editId.editText.text?.isNotEmpty() ?: false
             && binding.editName.editText.text?.isNotEmpty() ?: false
         ) {
             viewModel.saveSetData(
@@ -129,18 +147,33 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
     }
 
     private fun render(state: SetState) {
+
+        blockScreen(false)
         when (state) {
             is SetState.Data -> {
+                binding.btnDeleteSet.isVisible = true
                 setTexts(state.set)
             }
 
             SetState.Empty -> {
+                binding.btnDeleteSet.isVisible = false
                 setTexts(ConstructorSet(0, "", ""))
             }
 
-            SetState.Error -> Toast.makeText(requireContext(), "Ошибка", Toast.LENGTH_SHORT).show()
+            is SetState.Error -> showError(state.errorType)
+
+            SetState.Deleted -> {
+                binding.btnDeleteSet.isVisible = false
+                onBackPressed(false)
+            }
         }
 
+    }
+
+    private fun blockScreen(isBlocked: Boolean){
+        setViewAndChildrenEnabled(binding.root,! isBlocked)
+        binding.progressBar.isVisible = isBlocked
+        binding.blackout.isVisible = isBlocked
     }
 
     private fun setTexts(constructorSet: ConstructorSet) {
@@ -158,5 +191,6 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
 
     companion object {
         const val CONSTRUCTOR_SET_ID = "constructor_set_id"
+        const val Q_POSITIVE = 1
     }
 }

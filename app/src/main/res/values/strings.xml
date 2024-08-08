@@ -5,7 +5,7 @@
     <string name="set_data">Свойства набора</string>
     <string name="load_from_brick_link">Загрузить из Brick Link</string>
     <string name="go_to_collect">Перейти к сборке</string>
-    <string name="collect_process">Процесс сборки</string>
+    <string name="collect_process">Сборка</string>
     <string name="collect_status_line">Собрано</string>
     <string name="line_details_descr">Подробнее о детали в наборе</string>
     <string name="need_collect">Необходимо собрать</string>
@@ -13,4 +13,32 @@
     <string name="part_name">Наименование</string>
     <string name="part_id">ID части</string>
     <string name="need_f">Необходимо заполнить</string>
+    <string name="delete_set">Удалить сет</string>
+    <string name="cancel">Отменить</string>
+    <string name="complete">Подтвердить</string>
+    <string name="question">Вопрос</string>
+    <string name="q_delete_set">Удалить текущую сборку? Будет удалена вся информация по прогрессу</string>
+    <string name="e_nodata">Нет данных по запросу в сети</string>
+    <string name="e_nonetwork">Нет сети</string>
+    <string name="e_unknown">Неизвестная ошибка</string>
+    <string name="msg_noneedcollect">Сбор этой детали завершен</string>
+    <string name="fieldName">Имя</string>
+    <string name="fieldCount">Всего</string>
+    <string name="fieldCountFind">Найдено</string>
+    <string name="fieldNumber">Код детали</string>
+    <string name="fieldColor">Цвет</string>
+    <string name="sortUp">по возр</string>
+    <string name="sortDown">по убыв</string>
+    <string name="btnHideOn">Показать все</string>
+    <string name="btnHideOff">Скрыть собранные</string>
+    <string name="author_app">Автор: Ярыгин Андрей</string>
+    <string name="app_descr">Приложение предназначено для удобной сборки ваших наборов LEGO.
+        \n- Можно задать номер набора и он будет загружен с сайта BrickLinck.
+        Затем можно отсортировать детали по любому удобному параметру и начать сборку.
+        \n- Каждое нажатие на деталь добавляет единицу.
+        \n- Чтобы более точечно отредактировать текущую сборку детали нужно нажать на увеличительное стекло.
+        \n
+        \nПриятного использования !:)
+        \n
+        \nПо всем вопросам можно писать мне на почту:</string>
 </resources>

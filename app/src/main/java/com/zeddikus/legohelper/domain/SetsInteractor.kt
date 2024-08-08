@@ -17,7 +17,9 @@ interface SetsInteractor {
 
     suspend fun loadLine(lineId: Int): Flow<LineSetState>
 
-    suspend fun loadLines(setId: Int): Flow<LinesState>
+    suspend fun loadLines(setId: Int, hideCollected: Boolean): Flow<LinesState>
 
     suspend fun saveLine(constructorSetLine: ConstructorSetLine): Flow<LineSetState>
+
+    suspend fun deleteSet(setId: Int): Flow<SetState>
 }

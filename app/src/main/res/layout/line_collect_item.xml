@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    android:background="@null"
-    android:paddingTop="15dp">
+    android:background="?attr/selectableItemBackground"
+    android:paddingTop="5dp">
 
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -15,6 +15,7 @@
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/margin_8"
         android:scaleType="fitCenter"
+        android:background="?attr/selectableItemBackground"
         app:layout_constraintBottom_toTopOf="@id/tvDescr"
         app:layout_constraintDimensionRatio="h,1:1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,47 +27,45 @@
 
     <TextView
         android:id="@+id/tvDescr"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white"
+        android:textAlignment="center"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/BlackDay_WhiteNight"
         android:textSize="@dimen/line_collect_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnMinusOne"
+        app:layout_constraintEnd_toStartOf="@id/btnOpenDetails"
         app:layout_constraintStart_toEndOf="@id/btnPlusOne"
         app:layout_constraintTop_toBottomOf="@id/partCover"
         tools:text="Findet 4 from 12" />
 
     <Button
         android:id="@+id/btnPlusOne"
-        style="@style/StandartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/CollectButton"
+        android:layout_width="@dimen/size_collect_button"
+        android:layout_height="@dimen/size_collect_button"
         android:layout_weight="0"
         android:text="+"
-        android:visibility="visible"
-
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/partCover"
 
-        tools:visibility="visible" />
+        tools:visibility="gone" />
 
-    <Button
-        android:id="@+id/btnMinusOne"
-        style="@style/StandartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/btnOpenDetails"
+        android:background="@drawable/background_border"
+        android:layout_width="@dimen/size_collect_button"
+        android:layout_height="@dimen/size_collect_button"
         android:layout_weight="0"
-        android:text="-"
+        android:src="@drawable/ic_showdetails"
         android:textAlignment="center"
         android:textSize="@dimen/line_collect_text_size"
         android:visibility="visible"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/partCover"
-
         tools:visibility="visible" />
 
 

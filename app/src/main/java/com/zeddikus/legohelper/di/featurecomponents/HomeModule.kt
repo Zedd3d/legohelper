@@ -1,13 +1,19 @@
 package com.zeddikus.legohelper.di.featurecomponents
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.zeddikus.legohelper.data.db.SetsRepositoryImpl
 import com.zeddikus.legohelper.data.db.DatabaseDao
+import com.zeddikus.legohelper.data.sharedpreferences.SettingsRepositoryImpl
 import com.zeddikus.legohelper.db.RoomDB
 import com.zeddikus.legohelper.di.ViewModelKey
 import com.zeddikus.legohelper.domain.SetsInteractor
 import com.zeddikus.legohelper.domain.SetsInteractorImpl
 import com.zeddikus.legohelper.domain.SetsRepository
+import com.zeddikus.legohelper.domain.SettingsRepository
+import com.zeddikus.legohelper.domain.models.Settings
 import com.zeddikus.legohelper.presentation.viewmodel.HomeViewModel
 import dagger.Binds
 import dagger.Module
@@ -34,6 +40,11 @@ interface HomeModule {
         @Provides
         fun provideProfileDao(database: RoomDB): DatabaseDao {
             return database.databaseDao()
+        }
+
+        @Provides
+        fun provideSettings(context: Context): SettingsRepository {
+            return provideSettingsRepository(context)
         }
     }
 }

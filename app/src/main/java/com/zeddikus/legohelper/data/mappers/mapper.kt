@@ -54,7 +54,7 @@ object mapper {
         )
     }
 
-    fun mapToData(constructorSet: ConstructorSet): SetWithLines {
+    fun mapToDataWithLines(constructorSet: ConstructorSet): SetWithLines {
         val ml = mutableListOf<SetLineEntity>()
 
         constructorSet.lines.forEach { constSet ->
@@ -66,6 +66,14 @@ object mapper {
         return SetWithLines(
             set = SetEntity(id = constructorSet.id, setIdExt = constructorSet.setIdExt, name = constructorSet.name),
             lines = ml
+        )
+    }
+
+    fun mapToData(constructorSet: ConstructorSet): SetEntity {
+        return SetEntity(
+            id = constructorSet.id,
+            setIdExt = constructorSet.setIdExt,
+            name = constructorSet.name
         )
     }
 

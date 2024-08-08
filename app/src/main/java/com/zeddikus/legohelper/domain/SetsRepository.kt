@@ -21,5 +21,9 @@ interface SetsRepository {
 
     suspend fun loadLine(lineId: Int): Flow<LineSetState>
 
-    suspend fun loadLines(id: Int): Flow<LinesState>
+    suspend fun loadLines(id: Int, hideCollected: Boolean): Flow<LinesState>
+
+    suspend fun deleteSet(setId: Int): Flow<SetState>
+
+    suspend fun saveSetWithLinesAndParts(constructorSet: ConstructorSet): Int
 }

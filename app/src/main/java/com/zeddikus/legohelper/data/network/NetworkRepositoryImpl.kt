@@ -1,6 +1,10 @@
 package com.zeddikus.legohelper.data.network
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.zeddikus.legohelper.data.models.SearchResult
+import com.zeddikus.legohelper.di.ErrorTypes
 import com.zeddikus.legohelper.domain.SetsRepository
 import com.zeddikus.legohelper.domain.models.ConstructorPart
 import com.zeddikus.legohelper.domain.models.ConstructorSet
@@ -12,10 +16,16 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
+    private val context: Context,
     private val api: LegoBrickApi,
     private val setsRepository: SetsRepository
 ) : NetworkRepository {
     override suspend fun loadSet(setId: String): Flow<SetState> = flow {
+        if (!isConnected()) {
+            emit(SetState.Error(ErrorTypes.NoNetwork))
+            return@flow
+        }
+
         val constructorSet = setsRepository.loadSetByLegoId(setId)
 
         val idForRequest = if (setId.contains("-")) {setId} else {setId + "-1"}
@@ -23,9 +33,14 @@ class NetworkRepositoryImpl @Inject constructor(
         val response = api.getStartData(idForRequest)
         val b = response.body()?.string()?:""
 
+        if (b.contains("No Item(s) were found")) {
+            emit(SetState.Error(ErrorTypes.NoData))
+            return@flow
+        }
+
         val constructorSetToSave = handleBody(b,constructorSet)
 
-        setsRepository.saveSet(constructorSetToSave)
+        setsRepository.saveSetWithLinesAndParts(constructorSetToSave)
 
         emit(SetState.Data(constructorSetToSave))
     }
@@ -59,6 +74,7 @@ class NetworkRepositoryImpl @Inject constructor(
     }
 
     private fun loadDetailDescription(input: String, constructorSet: ConstructorSet) {
+
         var searchResult = getContentBetweenSubstrings(input, "/img.bricklink.com", "'")
         val imageUrl = searchResult.result
 
@@ -96,6 +112,13 @@ class NetworkRepositoryImpl @Inject constructor(
                 countFound = 0,
             )
 
+        if (resultLine.part.imgUrl.isEmpty()){
+            resultLine.part = resultLine.part.copy(
+                imgUrl = imageUrl,
+                colorCode = colorCode
+            )
+        }
+
         resultLine.count = detailCount
 
         constructorSet.lines[detailId] = resultLine
@@ -112,6 +135,22 @@ class NetworkRepositoryImpl @Inject constructor(
 
         val result = input.substring(startSymbol, endSymbol)
         return SearchResult(result, startSymbol, endSymbol)
+    }
+
+    private fun isConnected(): Boolean {
+        val connectivityManager = context.getSystemService(
+            Context.CONNECTIVITY_SERVICE
+        ) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> return true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> return true
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> return true
+            }
+        }
+        return false
     }
 }
 
