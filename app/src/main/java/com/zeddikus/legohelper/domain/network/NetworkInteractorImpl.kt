@@ -11,7 +11,7 @@ class NetworkInteractorImpl @Inject constructor(
     private val repository: NetworkRepository,
 ): NetworkInteractor {
 
-    override suspend fun loadSet(setId: String): Flow<SetState> {
-        return repository.loadSet(setId)
+    override suspend fun loadSet(setLegoId: String, setId: Int): Flow<SetState> {
+        return repository.loadSet(setLegoId, setId)
     }
 }

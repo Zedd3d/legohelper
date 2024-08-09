@@ -68,7 +68,7 @@
         android:layout_height="@dimen/standart_button"
         android:layout_weight="0"
         android:text="@string/load_from_brick_link"
-        android:visibility="visible"
+        android:visibility="gone"
 
         app:layout_constraintEnd_toEndOf="parent"
 

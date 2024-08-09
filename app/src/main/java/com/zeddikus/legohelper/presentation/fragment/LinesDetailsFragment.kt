@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -107,6 +109,7 @@ class LinesDetailsFragment : BaseFragment<FragmentLinedetailsBinding, BaseViewMo
     }
 
     private fun onBackPressed() {
+        setFragmentResult(ConstructorSetFragment.AFTER_COLLECT, bundleOf())
         viewModel.navigateUp()
     }
 

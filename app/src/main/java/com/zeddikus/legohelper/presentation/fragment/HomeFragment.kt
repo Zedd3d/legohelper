@@ -60,6 +60,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, BaseViewModel>() {
             viewModel.navigateTo(HomeFragmentDirections.actionHomeFragmentToSetFragment())
         }
 
+        binding.buttonTestCrash.setOnClickListener {
+            throw RuntimeException("Test Crash")
+        }
+
         viewModel.observeState().observe(viewLifecycleOwner){
             render(it)
         }

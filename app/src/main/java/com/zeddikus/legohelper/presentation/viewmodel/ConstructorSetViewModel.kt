@@ -28,7 +28,7 @@ class ConstructorSetViewModel @Inject constructor(
     private val stateSingleLiveData = MutableLiveData<Int>()
     fun observeSingleState(): LiveData<Int> = stateSingleLiveData
 
-    fun updateSetData(setId:Int = 0) {
+    fun loadSetData(setId:Int = 0) {
         if (setId == 0) {
             stateLiveData.postValue(SetState.Empty)
         } else {
@@ -48,6 +48,10 @@ class ConstructorSetViewModel @Inject constructor(
         }
     }
 
+    fun updateSetData() {
+        loadSetData(currentSetId)
+    }
+
     fun saveSetData(setIdExt: String, setName: String){
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -59,7 +63,7 @@ class ConstructorSetViewModel @Inject constructor(
         }
     }
 
-    suspend fun doSaveSetData(setIdExt: String, setName: String){
+    suspend fun doSaveSetData(setIdExt: String, setName: String, isLoading: Boolean = false){
 
         if (stateLiveData.value is SetState.Error) return
 
@@ -81,18 +85,24 @@ class ConstructorSetViewModel @Inject constructor(
                 )
             )
         }
-        stateLiveData.postValue(SetState.Data(ConstructorSet(
-            id = currentSetId,
-            setIdExt = setIdExt,
-            name = setName
-        )))
+        if (!isLoading) {
+            stateLiveData.postValue(
+                SetState.Data(
+                    ConstructorSet(
+                        id = currentSetId,
+                        setIdExt = setIdExt,
+                        name = setName
+                    )
+                )
+            )
+        }
     }
 
-    fun loadLines(setIdExt: String, setName: String){
+    fun loadFromBrickLink(setIdExt: String, setName: String){
         viewModelScope.launch(Dispatchers.IO) {
-            doSaveSetData(setIdExt, setName)
+            doSaveSetData(setIdExt, setName, true)
 //            runCatching {
-                networkInteractor.loadSet(setIdExt).collect{
+                networkInteractor.loadSet(setIdExt, currentSetId).collect{
                     stateLiveData.postValue(it)
                 }
 //            }.onFailure {
@@ -119,6 +129,7 @@ class ConstructorSetViewModel @Inject constructor(
 
     fun clearGoToValue(){
         stateSingleLiveData.postValue(0)
+        //stateLiveData.postValue(stateLiveData.value)
     }
 
     fun deleteSet(){

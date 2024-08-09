@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import com.zeddikus.legohelper.R
 import com.zeddikus.legohelper.base.BaseFragment
@@ -42,14 +42,21 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         super.onViewCreated(view, savedInstanceState)
 
         val setId = arguments?.getInt(CONSTRUCTOR_SET_ID) ?: 0
-        viewModel.updateSetData(setId)
+
+        if (setId == 0) {
+            setTexts(ConstructorSet(0, "", ""))
+        } else {
+            viewModel.loadSetData(setId)
+        }
 
         setListeners()
 
-        setTexts(ConstructorSet(0, "", ""))
-
         viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
+        }
+
+        setFragmentResultListener(AFTER_COLLECT) { s: String, bundle: Bundle ->
+            viewModel.updateSetData()
         }
 
         viewModel.observeSingleState().observe(viewLifecycleOwner) {
@@ -69,7 +76,7 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
         binding.btnLoadFromBrickLink.setOnClickListener {
             if (allFieldsFilled())
                 blockScreen(true)
-                viewModel.loadLines(
+                viewModel.loadFromBrickLink(
                     binding.editId.editText.text.toString(),
                     binding.editName.editText.text.toString()
                 )
@@ -148,19 +155,24 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
 
     private fun render(state: SetState) {
 
-        blockScreen(false)
+
         when (state) {
             is SetState.Data -> {
+                blockScreen(false)
                 binding.btnDeleteSet.isVisible = true
                 setTexts(state.set)
             }
 
             SetState.Empty -> {
+                blockScreen(false)
                 binding.btnDeleteSet.isVisible = false
                 setTexts(ConstructorSet(0, "", ""))
             }
 
-            is SetState.Error -> showError(state.errorType)
+            is SetState.Error -> {
+                blockScreen(false)
+                showError(state.errorType)
+            }
 
             SetState.Deleted -> {
                 binding.btnDeleteSet.isVisible = false
@@ -182,6 +194,7 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
 
         binding.editId.editText.setText(constructorSet.setIdExt)
         binding.editName.editText.setText(constructorSet.name)
+        binding.btnLoadFromBrickLink.isVisible = constructorSet.lines.isEmpty()
     }
 
     override fun onResume() {
@@ -192,5 +205,6 @@ class ConstructorSetFragment : BaseFragment<FragmentConstructorsetBinding, BaseV
     companion object {
         const val CONSTRUCTOR_SET_ID = "constructor_set_id"
         const val Q_POSITIVE = 1
+        const val AFTER_COLLECT = "after_collect"
     }
 }

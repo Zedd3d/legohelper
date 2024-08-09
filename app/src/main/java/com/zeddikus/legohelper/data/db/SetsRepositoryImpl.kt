@@ -55,6 +55,11 @@ class SetsRepositoryImpl @Inject constructor(
         return mapper.mapToDomain(result)
     }
 
+    override suspend fun loadSetByBaseId(setId: Int): ConstructorSet {
+        val result = roomDB.databaseDao().getSetWithLines(setId)
+        return mapper.mapToDomain(result!!)
+    }
+
     override suspend fun saveSet(constructorSet: ConstructorSet): Int {
         return roomDB.databaseDao().insertSet(
             mapper.mapToData(constructorSet)

@@ -15,6 +15,8 @@ interface SetsRepository {
 
     suspend fun loadSetByLegoId(setId: String): ConstructorSet
 
+    suspend fun loadSetByBaseId(setId: Int): ConstructorSet
+
     suspend fun saveSet(constructorSet: ConstructorSet): Int
 
     suspend fun saveLineSet(constructorSetLine: ConstructorSetLine): Flow<LineSetState>

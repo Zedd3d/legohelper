@@ -4,5 +4,5 @@ import com.zeddikus.legohelper.domain.models.SetState
 import kotlinx.coroutines.flow.Flow
 
 interface NetworkRepository {
-    suspend fun loadSet(setId: String): Flow<SetState>
+    suspend fun loadSet(setLegoId: String, setId: Int): Flow<SetState>
 }

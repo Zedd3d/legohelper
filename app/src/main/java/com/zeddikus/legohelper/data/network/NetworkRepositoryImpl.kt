@@ -20,15 +20,15 @@ class NetworkRepositoryImpl @Inject constructor(
     private val api: LegoBrickApi,
     private val setsRepository: SetsRepository
 ) : NetworkRepository {
-    override suspend fun loadSet(setId: String): Flow<SetState> = flow {
+    override suspend fun loadSet(setLegoId: String, setId: Int): Flow<SetState> = flow {
         if (!isConnected()) {
             emit(SetState.Error(ErrorTypes.NoNetwork))
             return@flow
         }
 
-        val constructorSet = setsRepository.loadSetByLegoId(setId)
+        val constructorSet = setsRepository.loadSetByBaseId(setId)
 
-        val idForRequest = if (setId.contains("-")) {setId} else {setId + "-1"}
+        val idForRequest = if (setLegoId.contains("-")) {setLegoId} else {setLegoId + "-1"}
 
         val response = api.getStartData(idForRequest)
         val b = response.body()?.string()?:""

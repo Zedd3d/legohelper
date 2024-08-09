@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.zeddikus.legohelper.R
 import com.zeddikus.legohelper.di.ErrorTypes
 import com.zeddikus.legohelper.di.ScreenComponent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
