@@ -17,7 +17,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.zeddikus.legohelper.R
 import com.zeddikus.legohelper.di.ErrorTypes
 import com.zeddikus.legohelper.di.ScreenComponent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -74,10 +73,10 @@ abstract class BaseFragment<T : ViewBinding, VM : BaseViewModel> : Fragment() {
         consumer: (Int) -> Unit?
         ) {
         val dialogWindow = MaterialAlertDialogBuilder(requireActivity())
-            .setNeutralButton(getString(R.string.cancel)) { dialog, which ->
+            .setNeutralButton(getString(R.string.cancel)) { _, _ ->
                 consumer.invoke(0)
             }
-            .setPositiveButton(getString(R.string.complete)) { dialog, which ->
+            .setPositiveButton(getString(R.string.complete)) { _, _ ->
                 consumer.invoke(1)
             }.setBackground(requireContext().getDrawable(R.drawable.btn_corners))
             .create()
@@ -107,20 +106,25 @@ abstract class BaseFragment<T : ViewBinding, VM : BaseViewModel> : Fragment() {
         btnCancel.setBackgroundColor(backgroundColor)
 
         dialogWindow.window?.decorView?.setBackgroundColor(backgroundColor)
-        dialogWindow.window?.decorView?.setBackgroundResource(R.drawable.alert_background)//setBackgroundColor(backgroundColor)
+        dialogWindow.window?.decorView?.setBackgroundResource(R.drawable.alert_background)
     }
 
-    fun showError(error:ErrorTypes) {
-        when (error){
+    fun showError(error: ErrorTypes) {
+        when (error) {
             ErrorTypes.NoData -> showToast(getString(R.string.e_nodata))
             ErrorTypes.NoNetwork -> showToast(getString(R.string.e_nonetwork))
-            ErrorTypes.Unknown -> showToast(getString(R.string.e_unknown))
+            is ErrorTypes.Unknown -> {
+                val message = if (error.code != null) {
+                    "${getString(R.string.e_unknown)} (код: ${error.code})"
+                } else {
+                    getString(R.string.e_unknown)
+                }
+                showToast(message)
+            }
         }
-
     }
 
-    fun showToast(messageText: String, toastType: Int = Toast.LENGTH_SHORT ){
-        Toast.makeText(context,messageText,toastType).show()
+    fun showToast(messageText: String, toastType: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(context, messageText, toastType).show()
     }
-
 }

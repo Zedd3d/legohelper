@@ -26,47 +26,104 @@ class NetworkRepositoryImpl @Inject constructor(
             return@flow
         }
 
-        val constructorSet = setsRepository.loadSetByBaseId(setId)
+        val constructorSet = try {
+            setsRepository.loadSetByBaseId(setId)
+        } catch (e: Exception) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
 
-        val idForRequest = if (setLegoId.contains("-")) {setLegoId} else {setLegoId + "-1"}
+        val idForRequest = normalizeSetIdForRequest(setLegoId)
 
-        val response = api.getStartData(idForRequest)
-        val b = response.body()?.string()?:""
+        val response = try {
+            api.getStartData(idForRequest)
+        } catch (e: Exception) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
 
-        if (b.contains("No Item(s) were found")) {
+        if (!response.isSuccessful) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
+
+        val body = try {
+            response.body()?.string().orEmpty()
+        } catch (e: Exception) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
+
+        if (body.isBlank()) {
             emit(SetState.Error(ErrorTypes.NoData))
             return@flow
         }
 
-        val constructorSetToSave = handleBody(b,constructorSet)
+        if (containsNoData(body)) {
+            emit(SetState.Error(ErrorTypes.NoData))
+            return@flow
+        }
 
-        setsRepository.saveSetWithLinesAndParts(constructorSetToSave)
+        val constructorSetToSave = try {
+            handleBody(body, constructorSet)
+        } catch (e: Exception) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
+
+        if (constructorSetToSave.lines.isEmpty()) {
+            emit(SetState.Error(ErrorTypes.NoData))
+            return@flow
+        }
+
+        try {
+            setsRepository.saveSetWithLinesAndParts(constructorSetToSave)
+        } catch (e: Exception) {
+            emit(SetState.Error(ErrorTypes.Unknown))
+            return@flow
+        }
 
         emit(SetState.Data(constructorSetToSave))
     }
 
-    private fun handleBody(b: String, constructorSet:ConstructorSet): ConstructorSet {
-        val startTable = b.lowercase().indexOf("Regular Items:".lowercase())
-        val endTable = b.lowercase().indexOf("<B>Summary:</B>".lowercase(),startTable)
+    private fun normalizeSetIdForRequest(setLegoId: String): String {
+        val trimmed = setLegoId.trim()
+        return if (trimmed.contains("-")) trimmed else "$trimmed-1"
+    }
 
-        val splitter = "<TR"
+    private fun containsNoData(body: String): Boolean {
+        val normalizedBody = body.lowercase()
+        return normalizedBody.contains("no item(s) were found".lowercase())
+    }
 
-        val bodyAnswer = b.substring(startTable, endTable - startTable).replace("\n","").replace(splitter,"\n")
+    private fun handleBody(body: String, constructorSet: ConstructorSet): ConstructorSet {
+        val startTable = body.indexOfIgnoreCase("Regular Items:")
+        if (startTable == -1) {
+            return constructorSet
+        }
+
+        val endMarkers = listOf("<B>Summary:</B>", "Extra Items:", "Counterparts:")
+        val endTable = endMarkers
+            .map { marker -> body.indexOfIgnoreCase(marker, startTable) }
+            .filter { it > startTable }
+            .minOrNull()
+            ?: body.length
+
+        if (endTable <= startTable) {
+            return constructorSet
+        }
+
+        val bodyAnswer = body
+            .substring(startTable, endTable)
+            .replace("\n", "")
+            .replace("<TR", "\n<TR")
+
         val listData = bodyAnswer.split("\n")
 
         for (line in listData) {
-            if (line.contains("Extra Items:")) {
-                break
+            if (!line.contains("/img.bricklink.com", ignoreCase = true)) {
+                continue
             }
-
-            if (line.contains("Counterparts:")) {
-                break
-            }
-
-            if (line.contains("Summary:")) {
-                break
-            }
-
             loadDetailDescription(line, constructorSet)
         }
 
@@ -74,31 +131,35 @@ class NetworkRepositoryImpl @Inject constructor(
     }
 
     private fun loadDetailDescription(input: String, constructorSet: ConstructorSet) {
+        val imageUrl = getContentBetweenSubstrings(input, "/img.bricklink.com", "'").result
+        if (imageUrl.isBlank()) return
 
-        var searchResult = getContentBetweenSubstrings(input, "/img.bricklink.com", "'")
-        val imageUrl = searchResult.result
+        val name = getContentBetweenSubstrings(input, "ALT=\"", "\"").result.trim()
 
-        if (imageUrl.isEmpty()) return
-
-        val name = getContentBetweenSubstrings(input, "ALT=\"", "\"").result
-
-        searchResult = getContentBetweenSubstrings(input, "catalogitem.page?", "&")
+        var searchResult = getContentBetweenSubstrings(input, "catalogitem.page?", "&")
         if (searchResult.result.contains("</A>")) {
             searchResult = getContentBetweenSubstrings(input, "catalogitem.page?", "\"")
         }
 
-        var detailNumber = searchResult.result
-        detailNumber = detailNumber.replace("=", "\n").split("\n")[1]
+        val detailNumber = extractDetailNumber(searchResult.result) ?: return
 
-        val colorCode =
-            getContentBetweenSubstrings(input, "&idColor=", "\"", searchResult.startSymbol).result
+        val colorCode = getContentBetweenSubstrings(
+            input,
+            "&idColor=",
+            "\"",
+            searchResult.startSymbol
+        ).result.trim()
+        if (colorCode.isBlank()) return
 
-        val detailCount =
-            getContentBetweenSubstrings(input, "\"RIGHT\">&nbsp;", "&nbsp;</TD>").result.toInt()
+        val detailCount = getContentBetweenSubstrings(
+            input,
+            "\"RIGHT\">&nbsp;",
+            "&nbsp;</TD>"
+        ).result.trim().toIntOrNull() ?: return
 
-        val detailId = "" + detailNumber + "_" + colorCode
+        val detailId = "${detailNumber}_$colorCode"
 
-        val resultLine = constructorSet.lines.get(detailId)
+        val resultLine = constructorSet.lines[detailId]
             ?: ConstructorSetLine(
                 lineId = 0,
                 setId = constructorSet.id,
@@ -112,20 +173,36 @@ class NetworkRepositoryImpl @Inject constructor(
                 countFound = 0,
             )
 
-        if (resultLine.part.imgUrl.isEmpty()){
+        if (resultLine.part.imgUrl.isEmpty()) {
             resultLine.part = resultLine.part.copy(
                 imgUrl = imageUrl,
                 colorCode = colorCode
             )
         }
 
-        resultLine.count = detailCount
+        if (resultLine.part.name.isBlank() && name.isNotBlank()) {
+            resultLine.part = resultLine.part.copy(name = name)
+        }
 
+        resultLine.count = detailCount
         constructorSet.lines[detailId] = resultLine
     }
 
+    private fun extractDetailNumber(rawValue: String): String? {
+        val cleanedValue = rawValue.trim()
+        if (cleanedValue.isBlank()) return null
 
-    private fun getContentBetweenSubstrings(input: String, startTag: String, endTag: String, startSearchSymbol: Int = 0, occurrence: Int = 1): SearchResult {
+        val parts = cleanedValue.replace("=", "\n").split("\n")
+        return parts.getOrNull(1)?.trim()?.takeIf { it.isNotBlank() }
+    }
+
+    private fun getContentBetweenSubstrings(
+        input: String,
+        startTag: String,
+        endTag: String,
+        startSearchSymbol: Int = 0,
+        occurrence: Int = 1
+    ): SearchResult {
         var startSymbol = input.indexOf(startTag, startSearchSymbol)
         if (startSymbol == -1) return SearchResult("", 0, 0)
 
@@ -135,6 +212,10 @@ class NetworkRepositoryImpl @Inject constructor(
 
         val result = input.substring(startSymbol, endSymbol)
         return SearchResult(result, startSymbol, endSymbol)
+    }
+
+    private fun String.indexOfIgnoreCase(value: String, startIndex: Int = 0): Int {
+        return indexOf(value, startIndex = startIndex, ignoreCase = true)
     }
 
     private fun isConnected(): Boolean {
@@ -153,4 +234,3 @@ class NetworkRepositoryImpl @Inject constructor(
         return false
     }
 }
-
