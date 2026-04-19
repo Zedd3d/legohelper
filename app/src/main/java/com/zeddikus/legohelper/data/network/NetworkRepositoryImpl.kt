@@ -43,7 +43,7 @@ class NetworkRepositoryImpl @Inject constructor(
         }
 
         if (!response.isSuccessful) {
-            emit(SetState.Error(ErrorTypes.Unknown))
+            emit(SetState.Error(ErrorTypes.HttpError(response.code())))
             return@flow
         }
 
