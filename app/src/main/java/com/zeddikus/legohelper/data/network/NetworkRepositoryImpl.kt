@@ -13,6 +13,7 @@ import com.zeddikus.legohelper.domain.models.SetState
 import com.zeddikus.legohelper.domain.network.NetworkRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class NetworkRepositoryImpl @Inject constructor(
@@ -37,6 +38,9 @@ class NetworkRepositoryImpl @Inject constructor(
 
         val response = try {
             api.getStartData(idForRequest)
+        } catch (e: UnknownHostException) {
+            emit(SetState.Error(ErrorTypes.NoNetwork))
+            return@flow
         } catch (e: Exception) {
             emit(SetState.Error(ErrorTypes.Unknown))
             return@flow
