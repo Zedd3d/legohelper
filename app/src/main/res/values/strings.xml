@@ -21,6 +21,7 @@
     <string name="e_nodata">Нет данных по запросу в сети</string>
     <string name="e_nonetwork">Нет сети</string>
     <string name="e_unknown">Неизвестная ошибка</string>
+    <string name="e_http_with_code">Ошибка сети. Код: %1$d</string>
     <string name="msg_noneedcollect">Сбор этой детали завершен</string>
     <string name="fieldName">Имя</string>
     <string name="fieldCount">Всего</string>
