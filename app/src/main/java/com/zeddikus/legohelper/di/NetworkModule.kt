@@ -6,7 +6,6 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
@@ -14,17 +13,24 @@ import java.util.concurrent.TimeUnit
 class NetworkModule {
 
     @Provides
-    fun provideOkHttpClient(
-    ): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        val authorizationInterceptor = { chain: Interceptor.Chain ->
+        val browserHeadersInterceptor = Interceptor { chain ->
             val request = chain.request()
                 .newBuilder()
-                .addHeader("User-Agent", "app name")
-                .header("Accept", "application/json")
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
+                )
+                .header(
+                    "Accept",
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+                )
+                .header("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+                .header("Referer", ApiConstants.BASE_URL)
                 .build()
             chain.proceed(request)
         }
@@ -33,7 +39,7 @@ class NetworkModule {
             .callTimeout(ApiConstants.CALL_TIMEOUT.toLong(), TimeUnit.SECONDS)
             .readTimeout(ApiConstants.READ_TIMEOUT.toLong(), TimeUnit.SECONDS)
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(authorizationInterceptor)
+            .addInterceptor(browserHeadersInterceptor)
             .build()
     }
 
