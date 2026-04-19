@@ -114,7 +114,18 @@ abstract class BaseFragment<T : ViewBinding, VM : BaseViewModel> : Fragment() {
             ErrorTypes.NoData -> showToast(getString(R.string.e_nodata))
             ErrorTypes.NoNetwork -> showToast(getString(R.string.e_nonetwork))
             ErrorTypes.Unknown -> showToast(getString(R.string.e_unknown))
-            is ErrorTypes.HttpError -> showToast(getString(R.string.e_http_with_code, error.code))
+            is ErrorTypes.HttpError -> showToast(getHttpErrorMessage(error.code))
+        }
+    }
+
+    private fun getHttpErrorMessage(code: Int): String {
+        return when (code) {
+            401 -> getString(R.string.e_http_401)
+            403 -> getString(R.string.e_http_403)
+            404 -> getString(R.string.e_http_404)
+            500 -> getString(R.string.e_http_500)
+            502 -> getString(R.string.e_http_502)
+            else -> getString(R.string.e_http_with_code, code)
         }
     }
 
