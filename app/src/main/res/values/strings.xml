@@ -21,6 +21,11 @@
     <string name="e_nodata">Нет данных по запросу в сети</string>
     <string name="e_nonetwork">Нет сети</string>
     <string name="e_unknown">Неизвестная ошибка</string>
+    <string name="e_http_401">Ошибка авторизации (401)</string>
+    <string name="e_http_403">Доступ запрещён (403)</string>
+    <string name="e_http_404">Страница не найдена (404)</string>
+    <string name="e_http_500">Внутренняя ошибка сервера (500)</string>
+    <string name="e_http_502">Шлюз недоступен (502)</string>
     <string name="e_http_with_code">Ошибка сети. Код: %1$d</string>
     <string name="msg_noneedcollect">Сбор этой детали завершен</string>
     <string name="fieldName">Имя</string>
