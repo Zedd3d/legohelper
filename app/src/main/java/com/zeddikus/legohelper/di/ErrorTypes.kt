@@ -6,4 +6,6 @@ sealed interface ErrorTypes {
     data object Unknown: ErrorTypes
 
     data object NoData: ErrorTypes
+
+    data class HttpError(val code: Int): ErrorTypes
 }

@@ -1,0 +1,11 @@
+<resources>
+    <string name="e_nodata">No data found for this network request</string>
+    <string name="e_nonetwork">No network connection</string>
+    <string name="e_unknown">Unknown error</string>
+    <string name="e_http_401">Authorization error (401)</string>
+    <string name="e_http_403">Access denied (403)</string>
+    <string name="e_http_404">Page not found (404)</string>
+    <string name="e_http_500">Internal server error (500)</string>
+    <string name="e_http_502">Bad gateway (502)</string>
+    <string name="e_http_with_code">Network error. Code: %1$d</string>
+</resources>
